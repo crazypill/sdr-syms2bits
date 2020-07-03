@@ -241,8 +241,18 @@ int main(int argc, const char * argv[]) {
             }
         }
 
+        // print input string
+        printf( "Input:  " );
+        for( int i = 0; i < stripped.length; i++ )
+        {
+            int bitCounter = (i % 8);
+            printf( "%c", stripped.UTF8String[i] );
+            if( bitCounter == 7 )
+                printf( " " );
+        }
+        printf( "\nBinary: " );
         
-//        printf( "Input: %s\nBinary: ", stripped.UTF8String );
+        // print converted input string
         for( int i = 0; i < nibbleCounter; i++ )
         {
             for( int x = 0; x < 4; x++ )
@@ -250,28 +260,29 @@ int main(int argc, const char * argv[]) {
                 bool bit = (buffer[i] & (1 << x)) >> x;
                 printf( "%d", bit );
             }
-            printf( " " );
+            if( i % 2 != 0 )        // remove this line to get output in nibbles
+                printf( " " );
         }
-//
+
 //        printf( "\nDecimal: " );
 //        for( int i = 0; i < byteCounter; i++ )
-//            printf( "%3u ", buffer[i] );
+//            printf( "%3u ", byte_buffer[i] );
 //
 //        printf( "\nHex:     " );
 //        for( int i = 0; i < nibbleCounter; i++ )
-//            printf( "%3X ", buffer[i] );
+//            printf( "%3X ", byte_buffer[i] );
 //
 //
 //        printf( "\nNibbles:  " );
 //        for( int i = 0; i < byteCounter; i++ )
-//            printf( "%2u %2u ", (buffer[i] & 0xF0) >> 4, buffer[i] & 0xF );
+//            printf( "%2u %2u ", (byte_buffer[i] & 0xF0) >> 4, byte_buffer[i] & 0xF );
 //
         // hide preamble and stuff
         printf( "\nHibbles:  " );
         for( int i = 0; i < nibbleCounter; i++ )
         {
             const unsigned char preamble[] = { 0xA, 0xA, 0xA, 0xA, 0x8, 0x6, 0x7, 0x5, 0xA, 0x2, 0x5 };
-//            const unsigned char preamble[] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+//            const unsigned char preamble[] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };   // test to make sure this code works so I don't miss bytes...
             if( i < 11 && preamble[i] != buffer[i] )
             {
                 if( !s_latch )
