@@ -267,12 +267,16 @@ int main(int argc, const char * argv[]) {
 //        printf( "\nDecimal: " );
 //        for( int i = 0; i < byteCounter; i++ )
 //            printf( "%3u ", byte_buffer[i] );
-//
-//        printf( "\nHex:     " );
-//        for( int i = 0; i < nibbleCounter; i++ )
-//            printf( "%3X ", byte_buffer[i] );
-//
-//
+
+        printf( "\nHex:     " );
+        for( int i = 0; i < nibbleCounter; i++ )
+        {
+            printf( "%3X ", buffer[i] );
+            
+            if( i % 2 != 0 )        // we do this to line up the hex with the nibbles above...
+                printf( " " );
+        }
+
 //        printf( "\nNibbles:  " );
 //        for( int i = 0; i < byteCounter; i++ )
 //            printf( "%2u %2u ", (byte_buffer[i] & 0xF0) >> 4, byte_buffer[i] & 0xF );
