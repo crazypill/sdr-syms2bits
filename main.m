@@ -257,7 +257,7 @@ int main(int argc, const char * argv[]) {
         }
 #endif
         
-        // hide preamble and stuff
+        // hide preamble and stuff - hibbles = hex nibbles
         printf( "\nHibbles:  " );
         for( int i = 0; i < nibbleCounter; i++ )
         {
