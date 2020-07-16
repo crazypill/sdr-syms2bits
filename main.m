@@ -78,6 +78,8 @@
 
 #define c2f( a ) (((a) * 1.8000) + 32)
 #define ms2mph( a ) ((a) * 2.23694)
+#define km2mph( a ) ((a) / 0.621371)
+
 
 typedef enum
 {
@@ -314,7 +316,7 @@ int main(int argc, const char * argv[]) {
         
         uint8_t crc = CalculateCRC( &byte_buffer[4], byteCounter - 5 );
         uint8_t message_crc = byte_buffer[byteCounter - 1];
-        printf( " CRC: %s (0x%X)\nBytes in payload: %d + 1 CRC byte, total bits: %d (%d with preamble)\n", message_crc == crc ? "yes" : "no", crc, byteCounter - 5, (int)stripped.length - 32, (int)stripped.length );
+        printf( " CRC: %s (0x%X)\nBytes in payload: %d + 1 CRC byte, total bits: %d (%d with preamble)\n", message_crc == crc ? "GOOD" : "WRONG", crc, byteCounter - 5, (int)stripped.length - 32, (int)stripped.length );
 
         printf( "\nPayload: " );
         for( int i = 4; i < byteCounter; i++ )
@@ -378,7 +380,7 @@ int main(int argc, const char * argv[]) {
                     const char* direction = compass[q[1]];
                     int windspeed = (q[2] << 4) | q[3];
                     float speed = windspeed / 10.0;
-                    printf( "(%0.2f°, %0.2fmph, %0.2fm/s %s)\n", q[1] * 22.5f, ms2mph( speed ), speed, direction );
+                    printf( "(%0.2f°, %0.2f mph, %0.2f m/s %s)\n", q[1] * 22.5f, ms2mph( speed ), speed, direction );
                 }
                 else if( type == kType_wind )
                 {
