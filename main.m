@@ -76,8 +76,8 @@
 //#define PRINT_BINARY
 
 
-#define c2f( a ) ((a * 1.8000) + 32)
-
+#define c2f( a ) (((a) * 1.8000) + 32)
+#define ms2mph( a ) ((a) * 2.23694)
 
 typedef enum
 {
@@ -334,7 +334,7 @@ int main(int argc, const char * argv[]) {
         uint8_t station_id = buffer[9] << 4 | (buffer[10] & 0xC);   // did I assemble this backwards?  strip out the error and aquire bits
         printf( "\n\nWeather[0x%x]: error: %d, aquire: %d, num quartets: %d\n", station_id, buffer[10] & 0x1, buffer[10] & 0x2, buffer[11] );
         
-        const char* compass[] = { "N  ", "NNE", "NE ", "ENE", "E  ", "ESE", "SE ", "SSE", "S  ", "SSW", "SW ", "WSW", "W  ", "WNW", "NW ", "NNW" };
+        const char* compass[] = { "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" };
         const char* types[]   = { "temp:    ", "humidity:", "rain:    ", "wind:    ", "gust:    " };
         if( buffer[8] == 0xA )
         {
@@ -377,8 +377,8 @@ int main(int argc, const char * argv[]) {
                     // next two nibbles wind speed in m per sec (i.e. no more than 255 m/s; 9th bit still not found)
                     const char* direction = compass[q[1]];
                     int windspeed = (q[2] << 4) | q[3];
-                    
-                    printf( "(%0.2f°, %2dm/s %s)\n", q[1] * 22.5f, windspeed, direction );
+                    float speed = windspeed / 10.0;
+                    printf( "(%0.2f°, %0.2fmph, %0.2fm/s %s)\n", q[1] * 22.5f, ms2mph( speed ), speed, direction );
                 }
                 else if( type == kType_wind )
                 {
