@@ -76,6 +76,9 @@
 //#define PRINT_BINARY
 
 
+#define c2f( a ) ((a * 1.8000) + 32)
+
+
 typedef enum
 {
     temperature,
@@ -107,6 +110,17 @@ typedef struct
 
 
 static bool s_latch = false;
+
+
+enum
+{
+    kType_temp,
+    kType_humidity,
+    kType_rain,
+    kType_wind,
+    kType_gust
+};
+
 
 
 
@@ -329,19 +343,19 @@ int main(int argc, const char * argv[]) {
                 char* typeStr = NULL;
                 switch( type )
                 {
-                    case 0:
+                    case kType_temp:
                         typeStr = "temp:    ";
                         break;
-                    case 1:
+                    case kType_humidity:
                         typeStr = "humidity:";
                         break;
-                    case 2:
+                    case kType_rain:
                         typeStr = "rain:    ";
                         break;
-                    case 3:
+                    case kType_wind:
                         typeStr = "wind:    ";
                         break;
-                    case 4:
+                    case kType_gust:
                         typeStr = "gust:    ";
                         break;
                     default:
@@ -351,7 +365,20 @@ int main(int argc, const char * argv[]) {
                 printf( "Quartet[%d]:  %s ", i, typeStr );
                 printf( "%2u ", *q++ );
                 printf( "%2u ", *q++ );
-                printf( "%2u\n", *q++ );
+                printf( "%2u ", *q++ );
+                
+                if( type == kType_temp )
+                {
+                     float t = 0;
+                     t += buffer[13] * 100.0;
+                     t += buffer[14] * 10.0;
+                     t += buffer[15] * 1.0;
+                     t = t / 10;
+                     t -= 40;
+                     printf( "(%0.2f°F, %0.2f°C)\n", c2f(t), t );
+                }
+                else
+                    printf( "\n" );
             }
         }
 
