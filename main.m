@@ -334,51 +334,62 @@ int main(int argc, const char * argv[]) {
         uint8_t station_id = buffer[9] << 4 | (buffer[10] & 0xC);   // did I assemble this backwards?  strip out the error and aquire bits
         printf( "\n\nWeather[0x%x]: error: %d, aquire: %d, num quartets: %d\n", station_id, buffer[10] & 0x1, buffer[10] & 0x2, buffer[11] );
         
+        const char* compass[] = { "N  ", "NNE", "NE ", "ENE", "E  ", "ESE", "SE ", "SSE", "S  ", "SSW", "SW ", "WSW", "W  ", "WNW", "NW ", "NNW" };
+        const char* types[]   = { "temp:    ", "humidity:", "rain:    ", "wind:    ", "gust:    " };
         if( buffer[8] == 0xA )
         {
             unsigned char* q = &buffer[12];
             for( int i = 0; i < nibbles; i++ )
             {
-                int type = *q++;
-                char* typeStr = NULL;
-                switch( type )
-                {
-                    case kType_temp:
-                        typeStr = "temp:    ";
-                        break;
-                    case kType_humidity:
-                        typeStr = "humidity:";
-                        break;
-                    case kType_rain:
-                        typeStr = "rain:    ";
-                        break;
-                    case kType_wind:
-                        typeStr = "wind:    ";
-                        break;
-                    case kType_gust:
-                        typeStr = "gust:    ";
-                        break;
-                    default:
-                        typeStr = "unknown: ";
-                        break;
-                }
+                int type = q[0];
+                const char* typeStr = NULL;
+                if( type >= 0 && type <= kType_gust )
+                    typeStr = types[type];
+                else
+                    typeStr = "unknown: ";
+
                 printf( "Quartet[%d]:  %s ", i, typeStr );
-                printf( "%2u ", *q++ );
-                printf( "%2u ", *q++ );
-                printf( "%2u ", *q++ );
+                printf( "%2u ", q[1] );
+                printf( "%2u ", q[2] );
+                printf( "%2u ", q[3] );
                 
                 if( type == kType_temp )
                 {
                      float t = 0;
-                     t += buffer[13] * 100.0;
-                     t += buffer[14] * 10.0;
-                     t += buffer[15] * 1.0;
+                     t += q[1] * 100.0;
+                     t += q[2] * 10.0;
+                     t += q[3] * 1.0;
                      t = t / 10;
                      t -= 40;
                      printf( "(%0.2f°F, %0.2f°C)\n", c2f(t), t );
                 }
+                else if( type == kType_humidity )
+                {
+                     float h = 0;
+                     h += q[1] * 100.0;
+                     h += q[2] * 10.0;
+                     h += q[3] * 1.0;
+                     printf( "(%g%%)\n", h );
+                }
+                else if( type == kType_wind )
+                {
+                    // first nibble direction of wind vane (multiply by 22.5 to obtain degrees, here 0xe*22.5 = 315 degrees)
+                    // next two nibbles wind speed in m per sec (i.e. no more than 255 m/s; 9th bit still not found)
+                    const char* direction = compass[q[1]];
+                    int windspeed = (q[2] << 4) | q[3];
+                    
+                    printf( "(%0.2f°, %2dm/s %s)\n", q[1] * 22.5f, windspeed, direction );
+                }
+                else if( type == kType_wind )
+                {
+                    // gust speed in m per sec
+                    int windgust = q[1] * 256 + q[2];
+                    printf( "(%2dm/s)\n", windgust );
+                }
                 else
                     printf( "\n" );
+                
+                q += 4;
             }
         }
 
