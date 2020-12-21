@@ -177,6 +177,8 @@ uint8_t reverseBits( uint8_t num )
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
     
+        printf( "-- tx31u ----------------------------------------------------------------------\n" );
+
         if( argc < 2 )
         {
             printf( "Wrong number of parameters.  Takes a single string with symbols in it.\n\n" );
